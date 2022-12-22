@@ -26,39 +26,40 @@ def build(bld):
     # Path to the source repo
     protobuf_root = bld.dependency_node("protobuf-source")
 
-    # abseil_root = protobuf_root.find_dir("third_party/abseil-cpp")
+    abseil_root = protobuf_root.find_dir("third_party/abseil-cpp")
 
-    # sources = abseil_root.ant_glob("absl/**/*[!_benchmark][!_test]*.cc")
-    # sources_to_include = []
-    # for source in sources:
-    #     if "test" in os.path.basename(source.abspath()):
-    #         continue
+    abseil_all_sources = abseil_root.ant_glob("absl/**/*.cc")
+    abseil_sources = []
 
-    #     if "benchmark" in os.path.basename(source.abspath()):
-    #         continue
+    for source in abseil_all_sources:
+        if "test" in os.path.basename(source.abspath()):
+            continue
 
-    #     sources_to_include.append(source)
+        if "benchmark" in os.path.basename(source.abspath()):
+            continue
 
-    # for source in sources_to_include:
-    #     print(os.path.basename(source.abspath()))
+        abseil_sources.append(source)
 
-    # bld.stlib(
-    #     target="abseil",
-    #     source=sources_to_include,
-    #     use=use_flags,
-    #     export_includes=[abseil_root.find_dir("absl")],
-    # )
-
-    # print(protobuf_root.abspath())
+    bld.stlib(
+        target="abseil",
+        source=abseil_sources,
+        includes=[
+            abseil_root.find_dir("absl"),
+        ],
+        use=use_flags,
+        export_includes=[
+            abseil_root.find_dir("absl"),
+        ],
+    )
 
     library_path = protobuf_root.find_dir("src/")
     include_path = protobuf_root.find_dir("src/")
 
-    # sources = library_path.ant_glob(
-    #     "google/protobuf/**/*[!_lite][!_test]*.cc",
-    # )
+    sources = library_path.ant_glob(
+        "google/protobuf/**/*[!_lite][!_test]*.cc",
+    )
 
-    all_sources = library_path.ant_glob('google/protobuf/**/*.cc')
+    all_sources = library_path.ant_glob("google/protobuf/**/*.cc")
     sources = []
 
     for source in all_sources:
@@ -68,15 +69,15 @@ def build(bld):
         if "benchmark" in os.path.basename(source.abspath()):
             continue
 
+        if "mock" in os.path.basename(source.abspath()):
+            continue
+
         sources.append(source)
-
-    print("SOURCES, ", sources)
-
 
     bld.stlib(
         target="protobuf",
         source=sources,
         includes=[include_path],
-        use=use_flags,
+        use=use_flags + ["abseil"],
         export_includes=[library_path.find_dir("google")],
     )
