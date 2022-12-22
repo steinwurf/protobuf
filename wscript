@@ -53,5 +53,5 @@ def build(bld):
         source=sources,
         includes=[include_path],
         use=use_flags,
-        export_includes=[library_path.find_dir("google")],
+        export_includes=[include_path],
     )
