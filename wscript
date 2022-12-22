@@ -52,39 +52,31 @@ def build(bld):
     # print(protobuf_root.abspath())
 
     library_path = protobuf_root.find_dir("src/")
+    include_path = protobuf_root.find_dir("src/")
 
-    sources = library_path.ant_glob(
-        "google/protobuf/**/*[!_lite][!_test]*.cc",
-    )
+    # sources = library_path.ant_glob(
+    #     "google/protobuf/**/*[!_lite][!_test]*.cc",
+    # )
 
-    sources_to_include = []
-    for source in sources:
+    all_sources = library_path.ant_glob('google/protobuf/**/*.cc')
+    sources = []
+
+    for source in all_sources:
         if "test" in os.path.basename(source.abspath()):
             continue
 
         if "benchmark" in os.path.basename(source.abspath()):
             continue
 
-        sources_to_include.append(source)
+        sources.append(source)
 
-    includes = library_path.ant_glob(
-        "google/protobuf/**/*[!_lite][!_test]*.h",
-    )
+    print("SOURCES, ", sources)
 
-    includes_to_include = []
-    for include in includes:
-        if "test" in os.path.basename(include.abspath()):
-            continue
-
-        if "benchmark" in os.path.basename(include.abspath()):
-            continue
-
-        includes_to_include.append(include)
 
     bld.stlib(
         target="protobuf",
-        source=sources_to_include,
-        includes=includes_to_include,
+        source=sources,
+        includes=[include_path],
         use=use_flags,
         export_includes=[library_path.find_dir("google")],
     )
