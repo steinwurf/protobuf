@@ -1,0 +1,6 @@
+.lock-waf**
+resolve_symlinks*
+coverage
+build_current*
+build*
+.waf**
