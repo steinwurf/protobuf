@@ -5,7 +5,7 @@ import os
 from waflib.extras.wurf.directory import remove_directory
 
 APPNAME = "protobuf"
-VERSION = "3.20.2"
+VERSION = "v21.12"
 
 
 def configure(conf):
@@ -25,32 +25,6 @@ def build(bld):
 
     # Path to the source repo
     protobuf_root = bld.dependency_node("protobuf-source")
-
-    abseil_root = protobuf_root.find_dir("third_party/abseil-cpp")
-
-    abseil_all_sources = abseil_root.ant_glob("absl/**/*.cc")
-    abseil_sources = []
-
-    for source in abseil_all_sources:
-        if "test" in os.path.basename(source.abspath()):
-            continue
-
-        if "benchmark" in os.path.basename(source.abspath()):
-            continue
-
-        abseil_sources.append(source)
-
-    bld.stlib(
-        target="abseil",
-        source=abseil_sources,
-        includes=[
-            abseil_root.find_dir("absl"),
-        ],
-        use=use_flags,
-        export_includes=[
-            abseil_root.find_dir("absl"),
-        ],
-    )
 
     library_path = protobuf_root.find_dir("src/")
     include_path = protobuf_root.find_dir("src/")
