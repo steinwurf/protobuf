@@ -52,6 +52,6 @@ def build(bld):
         target="protobuf",
         source=sources,
         includes=[include_path],
-        use=use_flags + ["abseil"],
+        use=use_flags,
         export_includes=[library_path.find_dir("google")],
     )
