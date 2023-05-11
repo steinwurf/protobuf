@@ -2,6 +2,8 @@
 # encoding: utf-8
 
 import os
+import pathlib
+
 from waflib.extras.wurf.directory import remove_directory
 
 APPNAME = "protobuf"
@@ -24,38 +26,22 @@ def build(bld):
     )
 
     # Path to the source repo
-    protobuf_root = bld.dependency_node("protobuf-source")
+    protobuf_source = bld.dependency_node("protobuf-source")
 
-    library_path = protobuf_root.find_dir("src/")
-    include_path = protobuf_root.find_dir("src/")
 
-    sources = library_path.ant_glob(
-        "google/protobuf/**/*[!_lite][!_test]*.cc",
-    )
+    include_path = protobuf_source.find_dir("src/")
 
-    all_sources = library_path.ant_glob("google/protobuf/**/*.cc")
-    sources = []
-
-    for source in all_sources:
-        if "test." in source.abspath():
-            continue
-
-        if "testing" in source.abspath():
-            continue
-
-        if "test_" in source.abspath():
-            continue
-
-        if "tester" in source.abspath():
-            continue
-
-        if "benchmark" in source.abspath():
-            continue
-
-        if "mock" in source.abspath():
-            continue
-
-        sources.append(source)
+    sources = protobuf_source.ant_glob(
+        "src/google/protobuf/**/*.cc", excl=["src/google/protobuf/compiler/**",
+                                             "src/google/protobuf/testing/**",
+                                             "src/google/protobuf/test_**",
+                                             "src/google/protobuf/mock_**",
+                                             "src/google/protobuf/benchmark_**",
+                                             "src/google/protobuf/**/*_unittest.cc",
+                                             "src/google/protobuf/**/*_test.cc",
+                                             "src/google/protobuf/**/*_test_*.cc",
+                                             "src/google/protobuf/**/*_tester.cc",
+                                             ])
 
     bld.stlib(
         target="protobuf",
