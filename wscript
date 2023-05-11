@@ -37,22 +37,22 @@ def build(bld):
     sources = []
 
     for source in all_sources:
-        if "test." in os.path.basename(source.abspath()):
+        if "test." in source.abspath():
             continue
 
-        if "testing" in os.path.basename(source.abspath()):
+        if "testing" in source.abspath():
             continue
 
-        if "test_" in os.path.basename(source.abspath()):
+        if "test_" in source.abspath():
             continue
 
-        if "tester" in os.path.basename(source.abspath()):
+        if "tester" in source.abspath():
             continue
 
-        if "benchmark" in os.path.basename(source.abspath()):
+        if "benchmark" in source.abspath():
             continue
 
-        if "mock" in os.path.basename(source.abspath()):
+        if "mock" in source.abspath():
             continue
 
         sources.append(source)
