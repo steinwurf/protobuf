@@ -16,7 +16,6 @@ def configure(conf):
 
 
 def build(bld):
-
     use_flags = []
     if bld.is_mkspec_platform("linux"):
         use_flags += ["PTHREAD"]
@@ -27,7 +26,6 @@ def build(bld):
 
     # Path to the source repo
     protobuf_source = bld.dependency_node("protobuf-source")
-
 
     include_path = protobuf_source.find_dir("src/")
 
@@ -41,6 +39,7 @@ def build(bld):
                                              "src/google/protobuf/**/*_test.cc",
                                              "src/google/protobuf/**/*_test_*.cc",
                                              "src/google/protobuf/**/*_tester.cc",
+                                             "src/google/protobuf/**/**lite**",
                                              ])
 
     bld.stlib(
