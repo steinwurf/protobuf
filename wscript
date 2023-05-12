@@ -39,7 +39,6 @@ def build(bld):
                                              "src/google/protobuf/**/*_test.cc",
                                              "src/google/protobuf/**/*_test_*.cc",
                                              "src/google/protobuf/**/*_tester.cc",
-                                             "src/google/protobuf/**/**lite**",
                                              ])
 
     bld.stlib(
