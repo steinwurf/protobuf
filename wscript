@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 APPNAME = "protobuf"
-VERSION = "v21.12"
+VERSION = "1.0.0"
 
 
 def configure(conf):
