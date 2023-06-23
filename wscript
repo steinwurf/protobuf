@@ -6,7 +6,7 @@ VERSION = "v21.12"
 
 
 def configure(conf):
-    conf.set_cxx_std(11)
+    conf.set_cxx_std(14)
     if conf.is_mkspec_platform("linux") and not conf.env["LIB_PTHREAD"]:
         conf.check_cxx(lib="pthread")
 
