@@ -1,61 +1,40 @@
 #! /usr/bin/env python
 # encoding: utf-8
 
-import os
-from waflib.extras.wurf.directory import remove_directory
-
 APPNAME = "protobuf"
-VERSION = "v21.12"
+VERSION = "1.0.0"
 
 
 def configure(conf):
+    conf.set_cxx_std(14)
     if conf.is_mkspec_platform("linux") and not conf.env["LIB_PTHREAD"]:
         conf.check_cxx(lib="pthread")
 
 
 def build(bld):
-
     use_flags = []
     if bld.is_mkspec_platform("linux"):
         use_flags += ["PTHREAD"]
 
-    bld.env.append_unique(
-        "DEFINES_STEINWURF_VERSION", 'STEINWURF_PROTOBUF_VERSION="{}"'.format(VERSION)
-    )
-
     # Path to the source repo
-    protobuf_root = bld.dependency_node("protobuf-source")
+    protobuf_source = bld.dependency_node("protobuf-source")
 
-    library_path = protobuf_root.find_dir("src/")
-    include_path = protobuf_root.find_dir("src/")
+    include_path = protobuf_source.find_dir("src/")
 
-    sources = library_path.ant_glob(
-        "google/protobuf/**/*[!_lite][!_test]*.cc",
+    sources = protobuf_source.ant_glob(
+        "src/google/protobuf/**/*.cc",
+        excl=[
+            "src/google/protobuf/compiler/**",
+            "src/google/protobuf/testing/**",
+            "src/google/protobuf/test_**",
+            "src/google/protobuf/mock_**",
+            "src/google/protobuf/benchmark_**",
+            "src/google/protobuf/**/*_unittest.cc",
+            "src/google/protobuf/**/*_test.cc",
+            "src/google/protobuf/**/*_test_*.cc",
+            "src/google/protobuf/**/*_tester.cc",
+        ],
     )
-
-    all_sources = library_path.ant_glob("google/protobuf/**/*.cc")
-    sources = []
-
-    for source in all_sources:
-        if "test." in os.path.basename(source.abspath()):
-            continue
-
-        if "testing" in os.path.basename(source.abspath()):
-            continue
-
-        if "test_" in os.path.basename(source.abspath()):
-            continue
-
-        if "tester" in os.path.basename(source.abspath()):
-            continue
-
-        if "benchmark" in os.path.basename(source.abspath()):
-            continue
-
-        if "mock" in os.path.basename(source.abspath()):
-            continue
-
-        sources.append(source)
 
     bld.stlib(
         target="protobuf",
