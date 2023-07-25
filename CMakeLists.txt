@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.12)
 project(protobuf)
 
+include_guard(GLOBAL)
+
 find_package(Python COMPONENTS Interpreter)
 
 # Use waf to resolve dependencies
