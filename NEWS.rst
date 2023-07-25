@@ -8,6 +8,11 @@ Latest
 ------
 * tbd
 
+1.1.0
+-----
+* Patch: Suppress warnings when building protoc and protobuf.
+* Minor: Added option for building protoc with `--with_protoc`.
+
 1.0.1
 -----
 * Patch: Added global include guard.

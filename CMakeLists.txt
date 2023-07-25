@@ -24,3 +24,15 @@ set(protobuf_BUILD_TESTS
     CACHE BOOL "Build tests")
 
 add_subdirectory("${STEINWURF_RESOLVE}/protobuf-source" protobuf)
+
+if (MSVC)
+  target_compile_options(protoc PRIVATE /W0)
+  target_compile_options(libprotoc PRIVATE /W0)
+  target_compile_options(libprotobuf PRIVATE /W0)
+  target_compile_options(libprotobuf-lite PRIVATE /W0)
+else()
+  target_compile_options(protoc PRIVATE -w)
+  target_compile_options(libprotoc PRIVATE -w)
+  target_compile_options(libprotobuf PRIVATE -w)
+  target_compile_options(libprotobuf-lite PRIVATE -w)
+endif()
