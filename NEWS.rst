@@ -8,6 +8,10 @@ Latest
 ------
 * tbd
 
+1.0.1
+-----
+* Patch: Added global include guard.
+
 1.0.0
 -----
 * Major: Initial release.
