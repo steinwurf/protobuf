@@ -28,7 +28,6 @@ waf-*
 waf3-*
 .waf-*
 .waf3-*
-.lock-*
 build
 build_current
 resolve_symlinks

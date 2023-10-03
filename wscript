@@ -22,14 +22,30 @@ def configure(conf):
 
 
 def build(bld):
-    use_flags = []
+    # Following is a fix for the build of protobuf
+    # to no print warnings its thousands of warnings
+    compiler_binary = bld.env.get_flat("CXX").lower()
+    cxxflags = ""
+    if "clang" in compiler_binary:
+        cxxflags += "-w"
+    elif "g++" in compiler_binary:
+        cxxflags += "-w"
+    elif "cl.exe" in compiler_binary:
+        cxxflags += "/W0"
+
+    _absl(bld, cxxflags)
+    _utf8_range(bld, cxxflags)
+
+    use_flags = ["absl", "utf8_range"]
     if bld.is_mkspec_platform("linux"):
         use_flags += ["PTHREAD"]
 
     # Path to the source repo
     protobuf_source = bld.dependency_node("protobuf-source")
 
-    include_path = protobuf_source.find_dir("src/")
+    includes = [
+        protobuf_source.find_dir("src/"),
+    ]
 
     sources = protobuf_source.ant_glob(
         "src/google/protobuf/**/*.cc",
@@ -43,27 +59,17 @@ def build(bld):
             "src/google/protobuf/**/*_test.cc",
             "src/google/protobuf/**/*_test_*.cc",
             "src/google/protobuf/**/*_tester.cc",
+            "src/google/protobuf/lazy_field_heavy.cc",
         ],
     )
-
-    # Following is a fix for the build of protobuf
-    # to no print warnings its thousands of warnings
-    compiler_binary = bld.env.get_flat("CXX").lower()
-    cxxflags = ""
-    if "clang" in compiler_binary:
-        cxxflags += "-w"
-    elif "g++" in compiler_binary:
-        cxxflags += "-w"
-    elif "cl.exe" in compiler_binary:
-        cxxflags += "/W0"
 
 
     bld.stlib(
         target="protobuf",
         source=sources,
-        includes=[include_path],
+        includes=includes,
         use=use_flags,
-        export_includes=[include_path],
+        export_includes=includes,
         cxxflags=cxxflags,
     )
 
@@ -85,6 +91,8 @@ def _protoc(bld, cxxflags):
             "src/google/protobuf/compiler/**/*_test_*.cc",
             "src/google/protobuf/compiler/**/*_test.cc",
             "src/google/protobuf/compiler/**/test_*.cc",
+            "src/google/protobuf/compiler/**/*tester.cc",
+            "src/google/protobuf/compiler/fake_plugin.cc",
         ],
     )
 
@@ -95,4 +103,55 @@ def _protoc(bld, cxxflags):
         target="protoc",
         use=["protobuf"],
         cxxflags=cxxflags,
+    )
+
+def _absl(bld, cxxflags):
+    protobuf_source = bld.dependency_node("protobuf-source")
+    
+    includes = protobuf_source.ant_glob(
+        "third_party/abseil-cpp/absl/*",
+    )
+
+    includes.append(protobuf_source.find_dir("third_party/abseil-cpp/"),)
+
+    sources = protobuf_source.ant_glob(
+        "third_party/abseil-cpp/absl/**/*.cc",
+        excl=[
+            "third_party/abseil-cpp/absl/**/*_test_*.cc",
+            "third_party/abseil-cpp/absl/**/*_test.cc",
+            "third_party/abseil-cpp/absl/**/test_*.cc",
+            "third_party/abseil-cpp/absl/**/*testing*",
+            "third_party/abseil-cpp/absl/**/*benchmark*",
+            "third_party/abseil-cpp/absl/**/*mock*",
+        ],
+    )
+
+    bld.stlib(
+        target="absl",
+        source=sources,
+        includes=includes,
+        export_includes=includes,
+        cxxflags=cxxflags,
+    )
+
+def _utf8_range(bld, cxxflags):
+    protobuf_source = bld.dependency_node("protobuf-source")
+    
+    includes = [protobuf_source.find_dir("third_party/utf8_range")]
+
+    sources = protobuf_source.ant_glob(
+        "third_party/utf8_range/*.cc",
+        "third_party/utf8_range/**/*.cc",
+        excl=[
+            "third_party/utf8_range/**/*test.cc",
+        ]
+    )
+
+    bld.stlib(
+        target="utf8_range",
+        source=sources,
+        includes=includes,
+        export_includes=includes,
+        cxxflags=cxxflags,
+        use=["absl"],
     )

@@ -12,7 +12,7 @@
         "name": "protobuf-source",
         "resolver": "git",
         "method": "checkout",
-        "checkout": "v21.12",
+        "checkout": "v24.3",
         "sources": [
             "github.com/protocolbuffers/protobuf.git"
         ],

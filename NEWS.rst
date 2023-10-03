@@ -6,7 +6,7 @@ every change, see the Git log.
 
 Latest
 ------
-* tbd
+* Major: Upgraded to protobuf 24.3.
 
 1.1.0
 -----
