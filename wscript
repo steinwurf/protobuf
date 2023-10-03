@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 APPNAME = "protobuf"
-VERSION = "1.1.0"
+VERSION = "2.0.0"
 
 def options(opt):
     opt.add_option(
