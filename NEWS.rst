@@ -6,7 +6,7 @@ every change, see the Git log.
 
 Latest
 ------
-* tbd
+* Patch: Custom cmake to prevent target name collisions.
 
 2.0.1
 -----
