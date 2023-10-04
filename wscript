@@ -126,6 +126,9 @@ def _absl(bld, cxxflags):
         ],
     )
 
+    if bld.is_mkspec_platform("windows"):
+        cxxflags += " /DNOMINMAX"
+
     bld.stlib(
         target="absl",
         source=sources,
