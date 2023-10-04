@@ -6,6 +6,10 @@ every change, see the Git log.
 
 Latest
 ------
+* tbd
+
+2.0.1
+-----
 * Patch: Fix problems with CMake and Waf on Windows and Mac OS.
 
 2.0.0
