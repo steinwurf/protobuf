@@ -5,6 +5,8 @@ include_guard(GLOBAL)
 
 find_package(Python COMPONENTS Interpreter)
 
+set(CMAKE_CXX_STANDARD 14)
+
 # Use waf to resolve dependencies
 if(NOT DEFINED STEINWURF_RESOLVE)
   message(STATUS "Resolving dependencies...")
