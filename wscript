@@ -1,8 +1,12 @@
 #! /usr/bin/env python
 # encoding: utf-8
 
+import os
+import shutil
+
 APPNAME = "protobuf"
 VERSION = "2.0.2"
+
 
 def options(opt):
     opt.add_option(
@@ -17,6 +21,10 @@ def configure(conf):
     conf.set_cxx_std(14)
     if conf.is_mkspec_platform("linux") and not conf.env["LIB_PTHREAD"]:
         conf.check_cxx(lib="pthread")
+
+    if conf.is_mkspec_platform("mac"):
+        conf.env.append_value("LINKFLAGS", ["-framework", "CoreFoundation"])
+
     if not conf.has_tool_option("with_protoc"):
         conf.env.stored_options["with_protoc"] = False
 
@@ -25,13 +33,13 @@ def build(bld):
     # Following is a fix for the build of protobuf
     # to no print warnings its thousands of warnings
     compiler_binary = bld.env.get_flat("CXX").lower()
-    cxxflags = ""
+    cxxflags = []
     if "clang" in compiler_binary:
-        cxxflags += "-w"
+        cxxflags += ["-w"]
     elif "g++" in compiler_binary:
-        cxxflags += "-w"
+        cxxflags += ["-w"]
     elif "cl.exe" in compiler_binary:
-        cxxflags += "/W0"
+        cxxflags += ["/W0"]
 
     _absl(bld, cxxflags)
     _utf8_range(bld, cxxflags)
@@ -63,7 +71,6 @@ def build(bld):
         ],
     )
 
-
     bld.stlib(
         target="protobuf",
         source=sources,
@@ -72,6 +79,15 @@ def build(bld):
         export_includes=includes,
         cxxflags=cxxflags,
     )
+
+    if bld.is_toplevel():
+        bld.program(
+            features="cxx test",
+            source=bld.path.ant_glob("test/cpp/*.cc") + bld.path.ant_glob("test/cpp/*.cpp"),
+            includes=["test/cpp/"],
+            target="protobuf_tests",
+            use=["protobuf", "gtest"],
+        )
 
     if bld.get_tool_option("with_protoc"):
         _protoc(bld, cxxflags)
@@ -105,14 +121,15 @@ def _protoc(bld, cxxflags):
         cxxflags=cxxflags,
     )
 
+
 def _absl(bld, cxxflags):
     protobuf_source = bld.dependency_node("protobuf-source")
-    
+
     includes = protobuf_source.ant_glob(
         "third_party/abseil-cpp/absl/*",
     )
 
-    includes.append(protobuf_source.find_dir("third_party/abseil-cpp/"),)
+    includes.append(protobuf_source.find_dir("third_party/abseil-cpp/"), )
 
     sources = protobuf_source.ant_glob(
         "third_party/abseil-cpp/absl/**/*.cc",
@@ -127,7 +144,7 @@ def _absl(bld, cxxflags):
     )
 
     if bld.is_mkspec_platform("windows"):
-        cxxflags += " /DNOMINMAX"
+        cxxflags += ["/DNOMINMAX"]
 
     bld.stlib(
         target="absl",
@@ -137,9 +154,10 @@ def _absl(bld, cxxflags):
         cxxflags=cxxflags,
     )
 
+
 def _utf8_range(bld, cxxflags):
     protobuf_source = bld.dependency_node("protobuf-source")
-    
+
     includes = [protobuf_source.find_dir("third_party/utf8_range")]
 
     sources = protobuf_source.ant_glob(
@@ -157,4 +175,25 @@ def _utf8_range(bld, cxxflags):
         export_includes=includes,
         cxxflags=cxxflags,
         use=["absl"],
+    )
+
+
+def protogen(ctx):
+    # check if protec is available
+    protoc_location = "build_current/protoc"
+    if not os.path.isfile(protoc_location):
+        ctx.fatal("protoc not found. Make sure to configure waf with `--with_protoc` to include protoc in build.")
+        return
+    try:
+        shutil.rmtree("test/cpp")
+    except:
+        pass
+    os.mkdir("test/cpp")
+
+    ctx.exec_command(
+        f"./{protoc_location} --cpp_out ./test/cpp --proto_path ./test test/*.proto"
+    )
+
+    ctx.exec_command(
+        "echo 'DisableFormat: true\nSortIncludes: false' > ./test/cpp/.clang-format"
     )
