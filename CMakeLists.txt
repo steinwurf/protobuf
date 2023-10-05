@@ -34,7 +34,7 @@ add_library(sw_protobuf_abseil STATIC ${sw_protobuf_abseil_sources})
 target_include_directories(sw_protobuf_abseil PUBLIC ${STEINWURF_RESOLVE}/protobuf-source/third_party/abseil-cpp)
 
 if (APPLE)
-    target_compile_options(sw_protobuf_abseil PRIVATE "-framework CoreFoundation")
+    target_link_libraries(sw_protobuf_abseil "-framework CoreFoundation")
 endif ()
 
 # utf8_range
