@@ -5,7 +5,6 @@
 // Distributed under the "BSD License". See the accompanying LICENSE.rst
 // file.
 
-#include <cstring>
 #include <gtest/gtest.h>
 
 #include "src.pb.h"

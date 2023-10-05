@@ -7,6 +7,7 @@ import shutil
 APPNAME = "protobuf"
 VERSION = "2.0.2"
 
+
 def options(opt):
     opt.add_option(
         "--with_protoc",
@@ -66,7 +67,6 @@ def build(bld):
         ],
     )
 
-
     bld.stlib(
         target="protobuf",
         source=sources,
@@ -79,14 +79,15 @@ def build(bld):
     if bld.is_toplevel():
         bld.program(
             features="cxx test",
-            source=bld.path.ant_glob("test/cpp/*:w7.cc"),
+            source=bld.path.ant_glob("test/cpp/*.cc") + bld.path.ant_glob("test/cpp/*.cpp"),
             includes=["test/cpp/"],
             target="protobuf_tests",
-            use=["protobuf"],
+            use=["protobuf", "gtest"],
         )
 
     if bld.get_tool_option("with_protoc"):
         _protoc(bld, cxxflags)
+
 
 def _protoc(bld, cxxflags):
     # Path to the source repo
@@ -116,14 +117,15 @@ def _protoc(bld, cxxflags):
         cxxflags=cxxflags,
     )
 
+
 def _absl(bld, cxxflags):
     protobuf_source = bld.dependency_node("protobuf-source")
-    
+
     includes = protobuf_source.ant_glob(
         "third_party/abseil-cpp/absl/*",
     )
 
-    includes.append(protobuf_source.find_dir("third_party/abseil-cpp/"),)
+    includes.append(protobuf_source.find_dir("third_party/abseil-cpp/"), )
 
     sources = protobuf_source.ant_glob(
         "third_party/abseil-cpp/absl/**/*.cc",
@@ -148,9 +150,10 @@ def _absl(bld, cxxflags):
         cxxflags=cxxflags,
     )
 
+
 def _utf8_range(bld, cxxflags):
     protobuf_source = bld.dependency_node("protobuf-source")
-    
+
     includes = [protobuf_source.find_dir("third_party/utf8_range")]
 
     sources = protobuf_source.ant_glob(
@@ -169,6 +172,7 @@ def _utf8_range(bld, cxxflags):
         cxxflags=cxxflags,
         use=["absl"],
     )
+
 
 def protogen(ctx):
     # check if protec is available
