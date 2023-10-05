@@ -21,20 +21,38 @@ if(NOT DEFINED STEINWURF_RESOLVE)
   set(STEINWURF_TOP_NAME ${PROJECT_NAME})
 endif()
 
-set(protobuf_BUILD_TESTS
-    OFF
-    CACHE BOOL "Build tests")
+# Abseil
+file(GLOB_RECURSE sw_protobuf_abseil_sources ${STEINWURF_RESOLVE}/protobuf-source/third_party/abseil-cpp/absl/**/*.cc)
+list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*_test_.*\.cc)
+list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*_test\.cc)
+list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/test_.*\.cc)
+list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*testing.*)
+list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*benchmark.*)
+list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*mock.*)
 
-add_subdirectory("${STEINWURF_RESOLVE}/protobuf-source" protobuf)
+add_library(sw_protobuf_abseil STATIC ${sw_protobuf_abseil_sources})
+target_include_directories(sw_protobuf_abseil PUBLIC ${STEINWURF_RESOLVE}/protobuf-source/third_party/abseil-cpp)
 
-if (MSVC)
-  target_compile_options(protoc PRIVATE /W0)
-  target_compile_options(libprotoc PRIVATE /W0)
-  target_compile_options(libprotobuf PRIVATE /W0)
-  target_compile_options(libprotobuf-lite PRIVATE /W0)
-else()
-  target_compile_options(protoc PRIVATE -w)
-  target_compile_options(libprotoc PRIVATE -w)
-  target_compile_options(libprotobuf PRIVATE -w)
-  target_compile_options(libprotobuf-lite PRIVATE -w)
+ # utf8_range
+file(GLOB_RECURSE sw_protobuf_utf8_range_sources
+        ${STEINWURF_RESOLVE}/protobuf-source/third_party/utf8_range/*.cc
+        ${STEINWURF_RESOLVE}/protobuf-source/third_party/utf8_range/**/*.cc)
+list(FILTER sw_protobuf_utf8_range_sources EXCLUDE REGEX .*test\.cc)
+
+add_library(sw_protobuf_utf8_range STATIC ${sw_protobuf_utf8_range_sources})
+target_link_libraries(sw_protobuf_utf8_range PRIVATE sw_protobuf_abseil)
+target_include_directories(sw_protobuf_utf8_range PUBLIC ${STEINWURF_RESOLVE}/protobuf-source/third_party/utf8_range)
+
+if (DEFINED MSVC)
+    target_compile_options(sw_protobuf_abseil PRIVATE /DNOMINMAX)
 endif()
+
+file(GLOB_RECURSE sw_protobuf_sources ${STEINWURF_RESOLVE}/protobuf-source/src/google/**/*.cc)
+list(FILTER sw_protobuf_sources EXCLUDE REGEX .*src/google/protobuf\/compiler\/.*)
+list(FILTER sw_protobuf_sources EXCLUDE REGEX .*src/google/protobuf\/.*test.*)
+
+add_library(sw_protobuf STATIC ${sw_protobuf_sources})
+target_link_libraries(sw_protobuf PUBLIC sw_protobuf_abseil sw_protobuf_utf8_range)
+target_include_directories(sw_protobuf PUBLIC ${STEINWURF_RESOLVE}/protobuf-source/src)
+
+add_library(steinwurf::protobuf ALIAS sw_protobuf)
