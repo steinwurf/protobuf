@@ -142,8 +142,10 @@ def _absl(bld, cxxflags):
     if bld.is_mkspec_platform("windows"):
         cxxflags += " /DNOMINMAX"
 
+    ldflags = ""
+
     if bld.is_mkspec_platform("mac"):
-        cxxflags += " -framework CoreFoundation"
+        ldflags += "-framework CoreFoundation"
 
     bld.stlib(
         target="absl",
@@ -151,6 +153,7 @@ def _absl(bld, cxxflags):
         includes=includes,
         export_includes=includes,
         cxxflags=cxxflags,
+        ldflags=ldflags,
     )
 
 
