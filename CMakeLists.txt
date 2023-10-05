@@ -30,6 +30,10 @@ list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*testing.*)
 list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*benchmark.*)
 list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*mock.*)
 
+if(APPLE)
+  target_link_libraries(sw_protobuf_abseil_sources "-framework CoreFoundation")
+endif()
+
 add_library(sw_protobuf_abseil STATIC ${sw_protobuf_abseil_sources})
 target_include_directories(sw_protobuf_abseil PUBLIC ${STEINWURF_RESOLVE}/protobuf-source/third_party/abseil-cpp)
 
@@ -56,3 +60,9 @@ target_link_libraries(sw_protobuf PUBLIC sw_protobuf_abseil sw_protobuf_utf8_ran
 target_include_directories(sw_protobuf PUBLIC ${STEINWURF_RESOLVE}/protobuf-source/src)
 
 add_library(steinwurf::protobuf ALIAS sw_protobuf)
+
+# Is top level project?
+if(${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})
+  add_library(sw_protobuf_test STATIC test/cpp/src.pb.cc)
+  target_link_libraries(sw_protobuf_test PUBLIC sw_protobuf)
+endif()

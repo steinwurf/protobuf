@@ -1,6 +1,9 @@
 #! /usr/bin/env python
 # encoding: utf-8
 
+import os
+import shutil
+
 APPNAME = "protobuf"
 VERSION = "2.0.2"
 
@@ -73,9 +76,17 @@ def build(bld):
         cxxflags=cxxflags,
     )
 
+    if bld.is_toplevel():
+        bld.program(
+            features="cxx test",
+            source=bld.path.ant_glob("test/cpp/*:w7.cc"),
+            includes=["test/cpp/"],
+            target="protobuf_tests",
+            use=["protobuf"],
+        )
+
     if bld.get_tool_option("with_protoc"):
         _protoc(bld, cxxflags)
-
 
 def _protoc(bld, cxxflags):
     # Path to the source repo
@@ -157,4 +168,24 @@ def _utf8_range(bld, cxxflags):
         export_includes=includes,
         cxxflags=cxxflags,
         use=["absl"],
+    )
+
+def protogen(ctx):
+    # check if protec is available
+    protoc_location = "build_current/protoc"
+    if not os.path.isfile(protoc_location):
+        ctx.fatal("protoc not found. Make sure to configure waf with `--with_protoc` to include protoc in build.")
+        return
+    try:
+        shutil.rmtree("test/cpp")
+    except:
+        pass
+    os.mkdir("test/cpp")
+
+    ctx.exec_command(
+        f"./{protoc_location} --cpp_out ./test/cpp --proto_path ./test test/*.proto"
+    )
+
+    ctx.exec_command(
+        "echo 'DisableFormat: true\nSortIncludes: false' > ./test/cpp/.clang-format"
     )
