@@ -143,8 +143,8 @@ def _absl(bld, cxxflags):
         cxxflags += " /DNOMINMAX"
 
     ldflags = ""
-
     if bld.is_mkspec_platform("mac"):
+        print("IS MAC")
         ldflags += "-framework CoreFoundation"
 
     bld.stlib(
