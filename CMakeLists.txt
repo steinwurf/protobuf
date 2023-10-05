@@ -63,8 +63,23 @@ add_library(steinwurf::protobuf ALIAS sw_protobuf)
 
 # Is top level project?
 if(${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})
-  file(GLOB_RECURSE sw_protobuf_test_sources ./test/cpp/*.cc)
-  add_library(sw_protobuf_test STATIC ${sw_protobuf_test_sources})
+  enable_testing()
+
+  if(CMAKE_C_COMPILER_ID MATCHES "MSVC")
+    # For Windows: Prevent overriding the parent project's compiler/linker
+    # settings
+    set(gtest_force_shared_crt
+            ON
+            CACHE BOOL "" FORCE)
+  endif()
+
+  # Google Test dependency
+  add_subdirectory("${STEINWURF_RESOLVE}/gtest-source")
+
+  file(GLOB_RECURSE sw_protobuf_test_sources ./test/cpp/*.cc  ./test/cpp/*.cpp)
+  add_executable(sw_protobuf_test ${sw_protobuf_test_sources})
   target_include_directories(sw_protobuf_test PRIVATE ${STEINWURF_RESOLVE}/test/cpp)
-  target_link_libraries(sw_protobuf_test PUBLIC sw_protobuf)
+  target_link_libraries(sw_protobuf_test PUBLIC gtest_main sw_protobuf)
+
+  add_test(sw_protobuf_test sw_protobuf_test)
 endif()
