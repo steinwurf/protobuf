@@ -21,6 +21,10 @@ def configure(conf):
     conf.set_cxx_std(14)
     if conf.is_mkspec_platform("linux") and not conf.env["LIB_PTHREAD"]:
         conf.check_cxx(lib="pthread")
+
+    if conf.is_mkspec_platform("mac"):
+        conf.env.append_value("LINKFLAGS", ["-framework", "CoreFoundation"])
+
     if not conf.has_tool_option("with_protoc"):
         conf.env.stored_options["with_protoc"] = False
 
@@ -29,13 +33,13 @@ def build(bld):
     # Following is a fix for the build of protobuf
     # to no print warnings its thousands of warnings
     compiler_binary = bld.env.get_flat("CXX").lower()
-    cxxflags = ""
+    cxxflags = []
     if "clang" in compiler_binary:
-        cxxflags += "-w"
+        cxxflags += ["-w"]
     elif "g++" in compiler_binary:
-        cxxflags += "-w"
+        cxxflags += ["-w"]
     elif "cl.exe" in compiler_binary:
-        cxxflags += "/W0"
+        cxxflags += ["/W0"]
 
     _absl(bld, cxxflags)
     _utf8_range(bld, cxxflags)
@@ -140,11 +144,7 @@ def _absl(bld, cxxflags):
     )
 
     if bld.is_mkspec_platform("windows"):
-        cxxflags += " /DNOMINMAX"
-
-    linkflags = ""
-    if bld.is_mkspec_platform("mac"):
-        linkflags += "-framework CoreFoundation"
+        cxxflags += ["/DNOMINMAX"]
 
     bld.stlib(
         target="absl",
@@ -152,7 +152,6 @@ def _absl(bld, cxxflags):
         includes=includes,
         export_includes=includes,
         cxxflags=cxxflags,
-        linkflags=linkflags,
     )
 
 
