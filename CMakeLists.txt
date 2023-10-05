@@ -43,6 +43,9 @@ add_library(sw_protobuf_utf8_range STATIC ${sw_protobuf_utf8_range_sources})
 target_link_libraries(sw_protobuf_utf8_range PRIVATE sw_protobuf_abseil)
 target_include_directories(sw_protobuf_utf8_range PUBLIC ${STEINWURF_RESOLVE}/protobuf-source/third_party/utf8_range)
 
+if (MSVC)
+    target_compile_options(sw_protobuf_abseil PRIVATE /DNOMINMAX)
+
 file(GLOB_RECURSE sw_protobuf_sources ${STEINWURF_RESOLVE}/protobuf-source/src/google/**/*.cc)
 list(FILTER sw_protobuf_sources EXCLUDE REGEX .*src/google/protobuf\/compiler\/.*)
 list(FILTER sw_protobuf_sources EXCLUDE REGEX .*src/google/protobuf\/.*test.*)
