@@ -6,6 +6,10 @@ every change, see the Git log.
 
 Latest
 ------
+* tbd
+
+2.0.3
+-----
 * Patch: Fixed some issues and added test for building of actually generated protobuf files.
 
 2.0.2
