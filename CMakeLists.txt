@@ -63,7 +63,8 @@ add_library(steinwurf::protobuf ALIAS sw_protobuf)
 
 # Is top level project?
 if(${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})
-  add_library(sw_protobuf_test STATIC test/cpp/*.cc)
+  file(GLOB_RECURSE sw_protobuf_test_sources ./test/cpp/*.cc)
+  add_library(sw_protobuf_test STATIC ${sw_protobuf_test_sources})
   target_include_directories(sw_protobuf_test PRIVATE ${STEINWURF_RESOLVE}/test/cpp)
   target_link_libraries(sw_protobuf_test PUBLIC sw_protobuf)
 endif()
