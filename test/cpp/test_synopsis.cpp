@@ -12,10 +12,32 @@
 
 TEST(test_synopsis, api)
 {
-    auto t = protobuf::Metrics();
-    t.set_protocol_version(1);
+    auto m = protobuf::Metrics();
+    m.set_protocol_version(1);
+
+    auto metric = m.add_metric();
+    auto info = metric->mutable_info();
+    info->set_kind(protobuf::Kind::COUNTER);
+    info->set_name("metric0");
+    info->set_description("An unsigned integer metric");
+    info->set_unit("bytes");
+
+    info->set_type(protobuf::Type::UINT64);
+    metric->set_uint64_value(42);
+    info->set_type(protobuf::Type::INT64);
+    metric->set_int64_value(-42);
+    info->set_type(protobuf::Type::FLOAT64);
+    metric->set_float64_value(123.f);
+    info->set_type(protobuf::Type::BOOL);
+    metric->set_bool_value(true);
 
     std::string json;
-    auto msg = google::protobuf::util::MessageToJsonString(t, &json);
-    EXPECT_TRUE(msg.ok());
+    auto status = google::protobuf::util::MessageToJsonString(m, &json);
+    EXPECT_TRUE(status.ok());
+
+    google::protobuf::util::JsonParseOptions options;
+    auto m2 = protobuf::Metrics();
+    options.ignore_unknown_fields = false;
+    status = google::protobuf::util::JsonStringToMessage(json, &m2, options);
+    EXPECT_TRUE(status.ok());
 }

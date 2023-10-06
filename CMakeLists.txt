@@ -5,8 +5,6 @@ include_guard(GLOBAL)
 
 find_package(Python COMPONENTS Interpreter)
 
-set(CMAKE_CXX_STANDARD 14)
-
 # Use waf to resolve dependencies
 if (NOT DEFINED STEINWURF_RESOLVE)
     message(STATUS "Resolving dependencies...")
@@ -23,14 +21,17 @@ endif ()
 
 # Abseil
 file(GLOB_RECURSE sw_protobuf_abseil_sources ${STEINWURF_RESOLVE}/protobuf-source/third_party/abseil-cpp/absl/**/*.cc)
-list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*_test_.*\.cc)
-list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*_test\.cc)
-list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/test_.*\.cc)
-list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*testing.*)
+list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*_benchmark.*)
 list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*benchmark.*)
-list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*mock.*)
+list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*test_.*)
+list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*_test.*)
+list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*mock_.*)
+list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*_mock_.*)
+
+message(STATUS "Abseil sources: ${sw_protobuf_abseil_sources}")
 
 add_library(sw_protobuf_abseil STATIC ${sw_protobuf_abseil_sources})
+target_compile_features(sw_protobuf_abseil PUBLIC cxx_std_14)
 target_include_directories(sw_protobuf_abseil PUBLIC ${STEINWURF_RESOLVE}/protobuf-source/third_party/abseil-cpp)
 
 if (APPLE)
@@ -44,11 +45,12 @@ file(GLOB_RECURSE sw_protobuf_utf8_range_sources
 list(FILTER sw_protobuf_utf8_range_sources EXCLUDE REGEX .*test\.cc)
 
 add_library(sw_protobuf_utf8_range STATIC ${sw_protobuf_utf8_range_sources})
+target_compile_features(sw_protobuf_utf8_range PUBLIC cxx_std_14)
 target_link_libraries(sw_protobuf_utf8_range PRIVATE sw_protobuf_abseil)
 target_include_directories(sw_protobuf_utf8_range PUBLIC ${STEINWURF_RESOLVE}/protobuf-source/third_party/utf8_range)
 
 if (DEFINED MSVC)
-    target_compile_options(sw_protobuf_abseil PRIVATE /DNOMINMAX)
+    target_compile_options(sw_protobuf_abseil PRIVATE "/DNOMINMAX")
 endif ()
 
 file(GLOB_RECURSE sw_protobuf_sources ${STEINWURF_RESOLVE}/protobuf-source/src/google/**/*.cc)
@@ -56,6 +58,7 @@ list(FILTER sw_protobuf_sources EXCLUDE REGEX .*src/google/protobuf\/compiler\/.
 list(FILTER sw_protobuf_sources EXCLUDE REGEX .*src/google/protobuf\/.*test.*)
 
 add_library(sw_protobuf STATIC ${sw_protobuf_sources})
+target_compile_features(sw_protobuf PUBLIC cxx_std_14)
 target_link_libraries(sw_protobuf PUBLIC sw_protobuf_abseil sw_protobuf_utf8_range)
 target_include_directories(sw_protobuf PUBLIC ${STEINWURF_RESOLVE}/protobuf-source/src)
 
