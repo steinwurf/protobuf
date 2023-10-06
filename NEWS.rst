@@ -6,6 +6,10 @@ every change, see the Git log.
 
 Latest
 ------
+* tbd
+
+2.0.4
+-----
 * Patch: Force CMake targets to use c++ std 14.
 
 2.0.3
