@@ -125,11 +125,10 @@ def _protoc(bld, cxxflags):
 def _absl(bld, cxxflags):
     protobuf_source = bld.dependency_node("protobuf-source")
 
-    includes = protobuf_source.ant_glob(
-        "third_party/abseil-cpp/absl/*",
-    )
-
-    includes.append(protobuf_source.find_dir("third_party/abseil-cpp/"), )
+    includes = [
+        protobuf_source.find_dir("third_party/abseil-cpp/"),
+        protobuf_source.find_dir("third_party/abseil-cpp/absl"),
+    ]
 
     sources = protobuf_source.ant_glob(
         "third_party/abseil-cpp/absl/**/*.cc",
