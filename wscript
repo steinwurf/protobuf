@@ -142,8 +142,6 @@ def _absl(bld, cxxflags):
         ],
     )
 
-    print(sources)
-
     if bld.is_mkspec_platform("windows"):
         cxxflags += ["/DNOMINMAX"]
 
