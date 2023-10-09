@@ -6,6 +6,10 @@ every change, see the Git log.
 
 Latest
 ------
+* tbd
+
+2.0.7
+-----
 * Patch: Fixed wrong includes for abseil in waf.
 
 2.0.6
