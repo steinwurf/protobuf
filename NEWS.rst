@@ -6,7 +6,7 @@ every change, see the Git log.
 
 Latest
 ------
-* Path: Cleaned CMake remove unneeded CXX_EXTENSIONS flags and a debug message.
+* Patch: Cleaned CMake remove unneeded CXX_EXTENSIONS flags and a debug message.
 
 2.0.4
 -----
