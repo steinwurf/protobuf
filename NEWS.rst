@@ -6,7 +6,7 @@ every change, see the Git log.
 
 Latest
 ------
-* tbd
+* Patch: Ignore -Wattribute warnings for GCC and Clang.
 
 2.0.5
 -----

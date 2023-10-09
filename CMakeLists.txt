@@ -60,6 +60,11 @@ target_compile_features(sw_protobuf PUBLIC cxx_std_17)
 target_link_libraries(sw_protobuf PUBLIC sw_protobuf_abseil sw_protobuf_utf8_range)
 target_include_directories(sw_protobuf PUBLIC ${STEINWURF_RESOLVE}/protobuf-source/src)
 
+# Ignore -Wattribute warnings for GCC and Clang
+if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
+    target_compile_options(sw_protobuf PRIVATE -Wno-attributes)
+endif ()
+
 add_library(steinwurf::protobuf ALIAS sw_protobuf)
 
 # Is top level project?
