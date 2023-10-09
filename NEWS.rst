@@ -6,7 +6,7 @@ every change, see the Git log.
 
 Latest
 ------
-* tbd
+* Path: Cleaned CMake remove unneeded CXX_EXTENSIONS flags and a debug message.
 
 2.0.4
 -----
