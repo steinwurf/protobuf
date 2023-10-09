@@ -6,6 +6,10 @@ every change, see the Git log.
 
 Latest
 ------
+* tbd
+
+2.0.8
+-----
 * Patch: Removed debug print in wscript.
 
 2.0.7
