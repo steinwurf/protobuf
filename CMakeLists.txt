@@ -28,10 +28,8 @@ list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*_test.*)
 list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*mock_.*)
 list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*_mock_.*)
 
-message(STATUS "Abseil sources: ${sw_protobuf_abseil_sources}")
-
 add_library(sw_protobuf_abseil STATIC ${sw_protobuf_abseil_sources})
-target_compile_features(sw_protobuf_abseil PUBLIC cxx_std_14)
+target_compile_features(sw_protobuf_abseil PUBLIC cxx_std_17)
 target_include_directories(sw_protobuf_abseil PUBLIC ${STEINWURF_RESOLVE}/protobuf-source/third_party/abseil-cpp)
 
 if (APPLE)
@@ -45,7 +43,7 @@ file(GLOB_RECURSE sw_protobuf_utf8_range_sources
 list(FILTER sw_protobuf_utf8_range_sources EXCLUDE REGEX .*test\.cc)
 
 add_library(sw_protobuf_utf8_range STATIC ${sw_protobuf_utf8_range_sources})
-target_compile_features(sw_protobuf_utf8_range PUBLIC cxx_std_14)
+target_compile_features(sw_protobuf_utf8_range PUBLIC cxx_std_17)
 target_link_libraries(sw_protobuf_utf8_range PRIVATE sw_protobuf_abseil)
 target_include_directories(sw_protobuf_utf8_range PUBLIC ${STEINWURF_RESOLVE}/protobuf-source/third_party/utf8_range)
 
@@ -58,7 +56,7 @@ list(FILTER sw_protobuf_sources EXCLUDE REGEX .*src/google/protobuf\/compiler\/.
 list(FILTER sw_protobuf_sources EXCLUDE REGEX .*src/google/protobuf\/.*test.*)
 
 add_library(sw_protobuf STATIC ${sw_protobuf_sources})
-target_compile_features(sw_protobuf PUBLIC cxx_std_14)
+target_compile_features(sw_protobuf PUBLIC cxx_std_17)
 target_link_libraries(sw_protobuf PUBLIC sw_protobuf_abseil sw_protobuf_utf8_range)
 target_include_directories(sw_protobuf PUBLIC ${STEINWURF_RESOLVE}/protobuf-source/src)
 
