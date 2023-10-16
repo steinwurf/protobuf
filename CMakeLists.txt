@@ -41,6 +41,7 @@ file(GLOB_RECURSE sw_protobuf_utf8_range_sources
         ${STEINWURF_RESOLVE}/protobuf-source/third_party/utf8_range/*.cc
         ${STEINWURF_RESOLVE}/protobuf-source/third_party/utf8_range/**/*.cc)
 list(FILTER sw_protobuf_utf8_range_sources EXCLUDE REGEX .*test\.cc)
+list(FILTER sw_protobuf_utf8_range_sources EXCLUDE REGEX .*fuzz.*\.cc) # Prevents missing cstdint include
 
 add_library(sw_protobuf_utf8_range STATIC ${sw_protobuf_utf8_range_sources})
 target_compile_features(sw_protobuf_utf8_range PUBLIC cxx_std_17)
