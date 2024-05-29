@@ -8,6 +8,10 @@ Latest
 ------
 * tbd
 
+2.0.10
+------
+* Patch: Added conditional linking of Android log library for sw_protobuf_abseil target in CMakeLists.
+
 2.0.9
 -----
 * Patch: Prevent missing cstdint include in utf8_range CMake.

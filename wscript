@@ -5,7 +5,7 @@ import os
 import shutil
 
 APPNAME = "protobuf"
-VERSION = "2.0.9"
+VERSION = "2.0.10"
 
 
 def options(opt):
