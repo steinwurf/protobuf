@@ -6,7 +6,7 @@ every change, see the Git log.
 
 Latest
 ------
-* tbd
+* Patch: Added the `protoc` executable target to CMakeLists.txt.
 
 2.0.10
 ------

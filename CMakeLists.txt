@@ -65,6 +65,20 @@ target_compile_features(sw_protobuf PUBLIC cxx_std_17)
 target_link_libraries(sw_protobuf PUBLIC sw_protobuf_abseil sw_protobuf_utf8_range)
 target_include_directories(sw_protobuf PUBLIC ${STEINWURF_RESOLVE}/protobuf-source/src)
 
+message(STATUS "STEINWURF_PROTOC: ${STEINWURF_PROTOC}")
+
+if (STEINWURF_PROTOC)
+    file(GLOB_RECURSE sw_protobuf_protoc_sources ${STEINWURF_RESOLVE}/protobuf-source/src/google/protobuf/compiler/*.cc)
+    list(FILTER sw_protobuf_protoc_sources EXCLUDE REGEX .*src/google/protobuf\/compiler\/.*test.*)
+    list(FILTER sw_protobuf_protoc_sources EXCLUDE REGEX .*src/google/protobuf\/compiler\/.*mock.*)
+    list(FILTER sw_protobuf_protoc_sources EXCLUDE REGEX .*src/google/protobuf\/compiler\/.*fake.*)
+    list(FILTER sw_protobuf_protoc_sources EXCLUDE REGEX .*src/google/protobuf\/compiler\/allowlists\/.*_test.*)
+
+    add_executable(protoc ${sw_protobuf_protoc_sources})
+    target_link_libraries(protoc PRIVATE sw_protobuf)
+    target_include_directories(protoc PRIVATE ${STEINWURF_RESOLVE}/protobuf-source/src)
+    target_compile_features(protoc PRIVATE cxx_std_17)
+endif ()
 # Ignore -Wattribute warnings for GCC and Clang
 if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
     target_compile_options(sw_protobuf PRIVATE -Wno-attributes)
