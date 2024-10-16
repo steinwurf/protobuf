@@ -6,7 +6,7 @@ every change, see the Git log.
 
 Latest
 ------
-* tbd
+* Patch: Compile abseil with -D_LARGEFILE64_SOURCE in CMake.
 
 2.0.11
 ------
