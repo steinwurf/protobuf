@@ -31,6 +31,10 @@ list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*_mock_.*)
 add_library(sw_protobuf_abseil STATIC ${sw_protobuf_abseil_sources})
 target_compile_features(sw_protobuf_abseil PUBLIC cxx_std_17)
 target_include_directories(sw_protobuf_abseil PUBLIC ${STEINWURF_RESOLVE}/protobuf-source/third_party/abseil-cpp)
+# Abseil has to be compiled with -D_LARGEFILE64_SOURCE
+target_compile_options(sw_protobuf_abseil PUBLIC -D_LARGEFILE64_SOURCE)
+
+
 
 if(ANDROID)
     target_link_libraries(sw_protobuf_abseil log)
