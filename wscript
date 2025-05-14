@@ -3,196 +3,104 @@
 
 import os
 import shutil
+import waflib
 
 APPNAME = "protobuf"
 VERSION = "2.0.10"
 
 
 def options(opt):
+
+    if not opt.is_toplevel():
+        return
+
     opt.add_option(
-        "--with_protoc",
+        "--cmake-build-type",
+        default="Release",
+        help="CMake build type (Release, Debug, RelWithDebInfo, etc.)",
+    )
+    opt.add_option("--cmake-toolchain", default="", help="Path to CMake toolchain file")
+
+    opt.add_option(
+        "--cmake-verbose",
         action="store_true",
-        default=None,
-        help="Add protoc to the build",
+        default=False,
+        help="Enable verbose output for CMake configure and build",
     )
 
 
-def configure(conf):
-    conf.set_cxx_std(14)
-    if conf.is_mkspec_platform("linux") and not conf.env["LIB_PTHREAD"]:
-        conf.check_cxx(lib="pthread")
+def configure(cfg):
 
-    if conf.is_mkspec_platform("mac"):
-        conf.env.append_value("LINKFLAGS", ["-framework", "CoreFoundation"])
+    if not cfg.is_toplevel():
+        return
 
-    if not conf.has_tool_option("with_protoc"):
-        conf.env.stored_options["with_protoc"] = False
+    cfg.env.BUILD_DIR = cfg.path.get_bld().abspath()
+
+    cmake_cmd = [
+        "cmake",
+        "-S",
+        cfg.path.abspath(),
+        "-B",
+        cfg.env.BUILD_DIR,
+        f"-DCMAKE_BUILD_TYPE={cfg.options.cmake_build_type}",
+    ]
+
+    if cfg.options.cmake_toolchain:
+        cmake_cmd.append(f"-DCMAKE_TOOLCHAIN_FILE={cfg.options.cmake_toolchain}")
+
+    if cfg.options.cmake_verbose:
+        cmake_cmd.append("-DCMAKE_VERBOSE_MAKEFILE=ON")
+
+    ret = cfg.exec_command(cmake_cmd, stdout=None, stderr=None)
+    if ret != 0:
+        cfg.fatal(f"CMake configuration {cmake_cmd} failed with exit code {ret}")
 
 
 def build(bld):
-    # Following is a fix for the build of protobuf
-    # to no print warnings its thousands of warnings
-    compiler_binary = bld.env.get_flat("CXX").lower()
-    cxxflags = []
-    if "clang" in compiler_binary:
-        cxxflags += ["-w"]
-    elif "g++" in compiler_binary:
-        cxxflags += ["-w"]
-    elif "cl.exe" in compiler_binary:
-        cxxflags += ["/W0"]
 
-    _absl(bld, cxxflags)
-    _utf8_range(bld, cxxflags)
-
-    use_flags = ["absl", "utf8_range"]
-    if bld.is_mkspec_platform("linux"):
-        use_flags += ["PTHREAD"]
-
-    # Path to the source repo
-    protobuf_source = bld.dependency_node("protobuf-source")
-
-    includes = [
-        protobuf_source.find_dir("src/"),
-    ]
-
-    sources = protobuf_source.ant_glob(
-        "src/google/protobuf/**/*.cc",
-        excl=[
-            "src/google/protobuf/compiler/**",
-            "src/google/protobuf/testing/**",
-            "src/google/protobuf/test_**",
-            "src/google/protobuf/mock_**",
-            "src/google/protobuf/benchmark_**",
-            "src/google/protobuf/**/*_unittest.cc",
-            "src/google/protobuf/**/*_test.cc",
-            "src/google/protobuf/**/*_test_*.cc",
-            "src/google/protobuf/**/*_tester.cc",
-            "src/google/protobuf/lazy_field_heavy.cc",
-        ],
-    )
-
-    bld.stlib(
-        target="protobuf",
-        source=sources,
-        includes=includes,
-        use=use_flags,
-        export_includes=includes,
-        cxxflags=cxxflags,
-    )
-
-    if bld.is_toplevel():
-        bld.program(
-            features="cxx test",
-            source=bld.path.ant_glob("test/cpp/*.cc") + bld.path.ant_glob("test/cpp/*.cpp"),
-            includes=["test/cpp/"],
-            target="protobuf_tests",
-            use=["protobuf", "gtest"],
-        )
-
-    if bld.get_tool_option("with_protoc"):
-        _protoc(bld, cxxflags)
-
-
-def _protoc(bld, cxxflags):
-    # Path to the source repo
-    protobuf_source = bld.dependency_node("protobuf-source")
-    include_path = protobuf_source.find_dir("src/")
-
-    sources = protobuf_source.ant_glob(
-        "src/google/protobuf/compiler/**/*.cc",
-        excl=[
-            "src/google/protobuf/compiler/**/*_unittest.cc",
-            "src/google/protobuf/compiler/**/mock_*.cc",
-            "src/google/protobuf/compiler/**/unittest.cc",
-            "src/google/protobuf/compiler/**/*_test_*.cc",
-            "src/google/protobuf/compiler/**/*_test.cc",
-            "src/google/protobuf/compiler/**/test_*.cc",
-            "src/google/protobuf/compiler/**/*tester.cc",
-            "src/google/protobuf/compiler/fake_plugin.cc",
-        ],
-    )
-
-    bld.program(
-        features=["cxx"],
-        source=sources,
-        includes=[include_path],
-        target="protoc",
-        use=["protobuf"],
-        cxxflags=cxxflags,
-    )
-
-
-def _absl(bld, cxxflags):
-    protobuf_source = bld.dependency_node("protobuf-source")
-
-    includes = [
-        protobuf_source.find_dir("third_party/abseil-cpp/"),
-        protobuf_source.find_dir("third_party/abseil-cpp/absl"),
-    ]
-
-    sources = protobuf_source.ant_glob(
-        "third_party/abseil-cpp/absl/**/*.cc",
-        excl=[
-            "third_party/abseil-cpp/absl/**/*_test_*.cc",
-            "third_party/abseil-cpp/absl/**/*_test.cc",
-            "third_party/abseil-cpp/absl/**/test_*.cc",
-            "third_party/abseil-cpp/absl/**/*testing*",
-            "third_party/abseil-cpp/absl/**/*benchmark*",
-            "third_party/abseil-cpp/absl/**/*mock*",
-        ],
-    )
-
-    if bld.is_mkspec_platform("windows"):
-        cxxflags += ["/DNOMINMAX"]
-
-    bld.stlib(
-        target="absl",
-        source=sources,
-        includes=includes,
-        export_includes=includes,
-        cxxflags=cxxflags,
-    )
-
-
-def _utf8_range(bld, cxxflags):
-    protobuf_source = bld.dependency_node("protobuf-source")
-
-    includes = [protobuf_source.find_dir("third_party/utf8_range")]
-
-    sources = protobuf_source.ant_glob(
-        "third_party/utf8_range/*.cc",
-        "third_party/utf8_range/**/*.cc",
-        excl=[
-            "third_party/utf8_range/**/*test.cc",
-        ]
-    )
-
-    bld.stlib(
-        target="utf8_range",
-        source=sources,
-        includes=includes,
-        export_includes=includes,
-        cxxflags=cxxflags,
-        use=["absl"],
-    )
-
-
-def protogen(ctx):
-    # check if protec is available
-    protoc_location = "build_current/protoc"
-    if not os.path.isfile(protoc_location):
-        ctx.fatal("protoc not found. Make sure to configure waf with `--with_protoc` to include protoc in build.")
+    if not bld.is_toplevel():
         return
-    try:
-        shutil.rmtree("test/cpp")
-    except:
-        pass
-    os.mkdir("test/cpp")
 
-    ctx.exec_command(
-        f"./{protoc_location} --cpp_out ./test/cpp --proto_path ./test test/*.proto"
-    )
+    jobs = str(bld.options.jobs) if hasattr(bld.options, "jobs") else "1"
+    cmake_build_cmd = [
+        "cmake",
+        "--build",
+        bld.env.BUILD_DIR,
+        "--parallel",
+        jobs,
+    ]
 
-    ctx.exec_command(
-        "echo 'DisableFormat: true\nSortIncludes: false' > ./test/cpp/.clang-format"
-    )
+    if bld.options.cmake_verbose:
+        cmake_build_cmd.append("--verbose")
+
+    ret = bld.exec_command(cmake_build_cmd, stdout=None, stderr=None)
+    if ret != 0:
+        bld.fatal(f"CMake build failed with exit code {ret}")
+
+
+class Clean(waflib.Context.Context):
+    cmd = "clean"
+    fun = "clean"
+
+
+def clean(ctx):
+    ctx.logger = waflib.Logs.make_logger("/tmp/waf_clean.log", "cfg")
+
+    build_dir = os.path.join(ctx.path.abspath(), "build")
+    build_symlink = os.path.join(ctx.path.abspath(), "build_current")
+
+    # Remove the "build" folder if it exists, with start and end messages
+    ctx.start_msg("\nChecking and removing build directory")
+    if os.path.isdir(build_dir):
+        shutil.rmtree(build_dir)
+        ctx.end_msg("Removed")
+    else:
+        ctx.end_msg("Not found", color="YELLOW")
+
+    # Remove the "build_current" symlink if it exists, with start and end messages
+    ctx.start_msg("Checking and removing build_current symlink")
+    if os.path.islink(build_symlink):
+        os.unlink(build_symlink)
+        ctx.end_msg("Removed")
+    else:
+        ctx.end_msg("Not found", color="YELLOW")
