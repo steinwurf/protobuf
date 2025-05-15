@@ -16,13 +16,19 @@ if (NOT DEFINED STEINWURF_RESOLVE)
         message(FATAL_ERROR "Failed: ${STATUS}")
     endif ()
     set(STEINWURF_RESOLVE "${CMAKE_CURRENT_SOURCE_DIR}/resolve_symlinks")
-    set(STEINWURF_TOP_NAME ${PROJECT_NAME})
 endif ()
 
 set(protobuf_BUILD_SHARED_LIBS OFF)
 set(protobuf_BUILD_TESTS OFF)
 
-add_subdirectory(${STEINWURF_RESOLVE}/protobuf-source)
+
+add_subdirectory(
+    ${STEINWURF_RESOLVE}/protobuf-source
+    ${CMAKE_CURRENT_BINARY_DIR}/protobuf-source 
+    EXCLUDE_FROM_ALL
+) 
+
+
 
 # Set PIE only for libprotobuf target
 set_target_properties(libprotobuf PROPERTIES POSITION_INDEPENDENT_CODE ON)
@@ -32,3 +38,26 @@ target_compile_features(libprotobuf PUBLIC cxx_std_17)
 
 # Make the steinwurf alias
 add_library(steinwurf::protobuf ALIAS libprotobuf)
+
+
+if(${PROJECT_NAME} STREQUAL ${CMAKE_PROJECT_NAME})
+
+  # Google Test dependency
+  add_subdirectory("${STEINWURF_RESOLVE}/gtest-source")
+
+  # Build test executable
+  file(GLOB_RECURSE protobuf_test_sources ./test/*.cpp)
+
+  # Add .cc files to the test sources
+  file(GLOB_RECURSE protobuf_test_sources_cc ./test/*.cc)
+  list(APPEND protobuf_test_sources ${protobuf_test_sources_cc})
+
+  add_executable(protobuf_tests ${protobuf_test_sources})
+  target_link_libraries(protobuf_tests gtest_main)
+  target_link_libraries(protobuf_tests steinwurf::protobuf)
+
+  add_test(protobuf_tests protobuf_tests)
+
+endif()
+
+
