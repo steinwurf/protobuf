@@ -23,33 +23,32 @@ def options(ctx):
 
 def configure(ctx):
 
-    # Add flags before loading cmake to include in the CMake configure
-    # command.
-    #
-    # The ABSL_PROPAGATE_CXX_STD flag is used to ensure that the C++ standard
-    # used by the C++ standard is consistent with the one used by the
-    # application.
-    ctx.env.append_value("CMAKE_ARGS", "-DABSL_PROPAGATE_CXX_STD=ON")
+    ctx.load("cmake")
 
     # Check if the user wants to build protoc
     if ctx.options.with_protoc:
         # Add flags to build protoc
-        ctx.env.append_value("CMAKE_ARGS", "-Dprotobuf_BUILD_PROTOC_BINARIES=ON")
+        ctx.env.CMAKE_CONFIGURE_ARGS += ["-Dprotobuf_BUILD_PROTOC_BINARIES=ON"]
     else:
         # Add flags to not build protoc
-        ctx.env.append_value("CMAKE_ARGS", "-Dprotobuf_BUILD_PROTOC_BINARIES=OFF")
+        ctx.env.CMAKE_CONFIGURE_ARGS += ["-Dprotobuf_BUILD_PROTOC_BINARIES=OFF"]
 
-    ctx.load("cmake")
+    if ctx.is_toplevel():
+        ctx.cmake_configure()
 
 
 def build(ctx):
 
     ctx.load("cmake")
 
+    if ctx.is_toplevel():
+        ctx.cmake_build()
 
-def clean(ctx):
 
-    ctx.load("cmake")
+def protogen(ctx):
+    """Generate C++ code from .proto files using protoc."""
 
-    # Set the default clean paths
-    ctx.clean_paths = ["build", "build_current"]
+    ctx.load_environment()
+    protoc = ctx.search_executable("**/protoc-*", path_list=[ctx.env.CMAKE_BUILD_DIR])
+
+    ctx.run_exectuable(f"{protoc} --cpp_out=cpp src.proto", cwd="./test")
