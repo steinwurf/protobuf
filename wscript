@@ -34,6 +34,9 @@ def configure(ctx):
         ctx.env.CMAKE_CONFIGURE_ARGS += ["-Dprotobuf_BUILD_PROTOC_BINARIES=OFF"]
 
     if ctx.is_toplevel():
+
+        ctx.env.CMAKE_CONFIGURE_ARGS += ["-DCMAKE_POLICY_VERSION_MINIMUM=3.5"]
+
         ctx.cmake_configure()
 
 
