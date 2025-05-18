@@ -18,5 +18,15 @@
         "sources": [
             "github.com/steinwurf/gtest.git"
         ]
+    },
+    {
+        "name": "abseil",
+        "internal": true,
+        "resolver": "git",
+        "method": "checkout",
+        "checkout": "c2435f8",
+        "sources": [
+            "github.com/abseil/abseil-cpp.git"
+        ]
     }
 ]
