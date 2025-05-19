@@ -3,7 +3,7 @@
         "name": "protobuf-source",
         "resolver": "git",
         "method": "checkout",
-        "checkout": "v24.3",
+        "checkout": "v31.0",
         "sources": [
             "github.com/protocolbuffers/protobuf.git"
         ],
@@ -13,20 +13,19 @@
         "name": "gtest",
         "internal": true,
         "resolver": "git",
-        "method": "semver",
-        "major": 5,
+        "method": "checkout",
+        "checkout": "cmake-update",
         "sources": [
             "github.com/steinwurf/gtest.git"
         ]
     },
     {
         "name": "abseil",
-        "internal": true,
         "resolver": "git",
         "method": "checkout",
-        "checkout": "c2435f8",
+        "checkout": "initial",
         "sources": [
-            "github.com/abseil/abseil-cpp.git"
+            "github.com/steinwurf/abseil-cpp.git"
         ]
     }
 ]

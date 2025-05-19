@@ -22,39 +22,20 @@ endif ()
 set(protobuf_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(protobuf_BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 set(protobuf_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-set(ABSL_PROPAGATE_CXX_STD ON CACHE BOOL "" FORCE)
-
-
-set(ABSL_ENABLE_INSTALL ON)
-
-
 
 # Abseil dependency
 if(NOT TARGET absl::base)
   add_subdirectory("${STEINWURF_RESOLVE}/abseil" abseil EXCLUDE_FROM_ALL)
 endif()
 
-# Malloc internal is a library defined in Abseil that is used by Protobuf. it
-# fails with a error: unknown type name 'off64_t' which can be solved by
-# defining _LARGEFILE64_SOURCE. This is a workaround until the issue is fixed in
-# Abseil.
-target_compile_definitions(malloc_internal PUBLIC _LARGEFILE64_SOURCE)
-
-
-
+# Build Protobuf
 add_subdirectory(
     ${STEINWURF_RESOLVE}/protobuf-source
-    ${CMAKE_CURRENT_BINARY_DIR}/protobuf-source 
-) 
+    ${CMAKE_CURRENT_BINARY_DIR}/protobuf-source
+)
 
 # Set PIE only for libprotobuf target
 set_target_properties(libprotobuf PROPERTIES POSITION_INDEPENDENT_CODE ON)
-
-# Malloc internal is a library defined in Abseil that is used by Protobuf. it
-# fails with a error: unknown type name 'off64_t' which can be solved by
-# defining _LARGEFILE64_SOURCE. This is a workaround until the issue is fixed in
-# Abseil.
-#target_compile_definitions(malloc_internal PUBLIC _LARGEFILE64_SOURCE)
 
 
 if(${PROJECT_NAME} STREQUAL ${CMAKE_PROJECT_NAME})
