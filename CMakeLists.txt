@@ -31,6 +31,9 @@ endif()
 # Make sure we build the library
 set(protobuf_BUILD_PROTOBUF_BINARIES ON CACHE BOOL "" FORCE)
 
+# Use static MSVC runtime
+set(protobuf_MSVC_STATIC_RUNTIME ON CACHE BOOL "" FORCE)
+
 # Build Protobuf
 add_subdirectory(
     ${STEINWURF_RESOLVE}/protobuf-source
