@@ -28,15 +28,14 @@ if(NOT TARGET absl::base)
   add_subdirectory("${STEINWURF_RESOLVE}/abseil" abseil EXCLUDE_FROM_ALL)
 endif()
 
+# Make sure we build the library
+set(protobuf_BUILD_PROTOBUF_BINARIES ON CACHE BOOL "" FORCE)
+
 # Build Protobuf
 add_subdirectory(
     ${STEINWURF_RESOLVE}/protobuf-source
     ${CMAKE_CURRENT_BINARY_DIR}/protobuf-source
 )
-
-# Set PIE only for libprotobuf target
-set_target_properties(libprotobuf PROPERTIES POSITION_INDEPENDENT_CODE ON)
-
 
 if(${PROJECT_NAME} STREQUAL ${CMAKE_PROJECT_NAME})
 

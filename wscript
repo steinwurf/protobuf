@@ -29,13 +29,11 @@ def configure(ctx):
     if ctx.options.with_protoc:
         # Add flags to build protoc
         ctx.env.CMAKE_CONFIGURE_ARGS += [
-            "-Dprotobuf_BUILD_PROTOBUF_BINARIES=ON",
             "-Dprotobuf_BUILD_PROTOC_BINARIES=ON",
         ]
     else:
         # Add flags to not build protoc
         ctx.env.CMAKE_CONFIGURE_ARGS += [
-            "-Dprotobuf_BUILD_PROTOBUF_BINARIES=OFF",
             "-Dprotobuf_BUILD_PROTOC_BINARIES=OFF",
         ]
 
