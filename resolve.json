@@ -27,5 +27,15 @@
         "sources": [
             "github.com/steinwurf/abseil-cpp.git"
         ]
+    },
+    {
+        "name": "toolchains",
+        "internal": true,
+        "resolver": "git",
+        "method": "checkout",
+        "checkout": "master",
+        "sources": [
+            "github.com/steinwurf/cmake-toolchains.git"
+        ]
     }
 ]
