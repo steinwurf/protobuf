@@ -56,7 +56,7 @@ if(${PROJECT_NAME} STREQUAL ${CMAKE_PROJECT_NAME})
   list(APPEND protobuf_test_sources ${protobuf_test_sources_cc})
 
   add_executable(protobuf_tests ${protobuf_test_sources})
-  target_link_libraries(protobuf_tests gtest_main)
+  target_link_libraries(protobuf_tests steinwurf::gtest)
   target_link_libraries(protobuf_tests protobuf::libprotobuf)
 
   enable_testing()
