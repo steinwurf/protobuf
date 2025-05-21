@@ -6,6 +6,10 @@ every change, see the Git log.
 
 Latest
 ------
+* tbd
+
+3.0.0
+-----
 * Patch: Compile abseil with -D_LARGEFILE64_SOURCE in CMake.
 * Major: Upgraded to protobuf 31.0
 * Major: Upgraded to stand-alone abseil dependency.

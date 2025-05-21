@@ -6,7 +6,7 @@ import shutil
 import waflib
 
 APPNAME = "protobuf"
-VERSION = "2.0.10"
+VERSION = "3.0.0"
 
 
 def options(ctx):
