@@ -32,13 +32,29 @@ jobs:
     name: ${{ matrix.config.name }}
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Waf Clean
         run: python3 waf clean --no_resolve
       - name: Waf Configure
         run: python3 waf configure --git_protocol=git@ --cmake_toolchain=${{ matrix.config.toolchain }} --cmake_verbose --with_protoc
       - name: Waf Build
         run: python3 waf build --run_tests
+
+  zig_toolchain_build:
+    name: Zig Toolchain Build (Docker)
+    runs-on: ubuntu-latest
+    container:
+      image: kassany/bookworm-ziglang
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+      - name: Waf Clean
+        run: python3 waf clean --no_resolve
+      - name: Waf Configure with Zig Toolchain
+        run: python3 waf configure --git_protocol=git@ --cmake_toolchain=../cmake-toolchains/zig-toolchain-x86_64-linux-musl.cmake --cmake_verbose --with_protoc
+      - name: Waf Build with Zig Toolchain
+        run: python3 waf build --run_tests
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
   cancel-in-progress: true
