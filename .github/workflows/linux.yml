@@ -32,7 +32,7 @@ jobs:
     name: ${{ matrix.config.name }}
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
       - name: Waf Clean
         run: python3 waf clean --no_resolve
       - name: Waf Configure
