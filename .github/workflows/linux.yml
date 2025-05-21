@@ -31,6 +31,8 @@ jobs:
       - ${{ matrix.config.runner }}
     name: ${{ matrix.config.name }}
     steps:
+      - name: Ensure correct owner of repository
+        run: sudo chown -R actions-runner:actions-runner .
       - name: Checkout source code
         uses: actions/checkout@v3
       - name: Waf Clean
