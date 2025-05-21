@@ -14,7 +14,7 @@ def options(ctx):
 
     # Add option whether to build protoc
     ctx.add_option(
-        "--with-protoc",
+        "--with_protoc",
         action="store_true",
         default=False,
         help="Build protoc (default: %default)",
