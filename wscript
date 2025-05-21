@@ -14,7 +14,7 @@ def options(ctx):
 
     # Add option whether to build protoc
     ctx.add_option(
-        "--with_protoc",
+        "--without_protoc",
         action="store_true",
         default=False,
         help="Build protoc (default: %default)",
@@ -26,15 +26,15 @@ def configure(ctx):
     ctx.load("cmake")
 
     # Check if the user wants to build protoc
-    if ctx.options.with_protoc:
+    if ctx.options.without_protoc:
         # Add flags to build protoc
         ctx.env.CMAKE_CONFIGURE_ARGS += [
-            "-Dprotobuf_BUILD_PROTOC_BINARIES=ON",
+            "-Dprotobuf_BUILD_PROTOC_BINARIES=OFF",
         ]
     else:
         # Add flags to not build protoc
         ctx.env.CMAKE_CONFIGURE_ARGS += [
-            "-Dprotobuf_BUILD_PROTOC_BINARIES=OFF",
+            "-Dprotobuf_BUILD_PROTOC_BINARIES=ON",
         ]
 
     if ctx.is_toplevel():
