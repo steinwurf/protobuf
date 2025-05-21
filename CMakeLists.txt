@@ -46,7 +46,7 @@ add_subdirectory(
 if(${PROJECT_NAME} STREQUAL ${CMAKE_PROJECT_NAME})
 
   # Google Test dependency
-  add_subdirectory("${STEINWURF_RESOLVE}/gtest-source")
+  add_subdirectory("${STEINWURF_RESOLVE}/gtest")
 
   # Build test executable
   file(GLOB_RECURSE protobuf_test_sources ./test/*.cpp)
