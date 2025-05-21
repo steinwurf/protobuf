@@ -47,6 +47,16 @@ jobs:
         run: python3 waf configure --git_protocol=git@ --cmake_toolchain=${{ matrix.config.toolchain }} --cmake_verbose --with_protoc
       - name: Waf Build
         run: python3 waf build --run_tests
+      - name: Echo Environment Variables
+        run: |
+          echo "GITHUB_RUN_ID: $GITHUB_RUN_ID"
+          echo "GITHUB_RUN_NUMBER: $GITHUB_RUN_NUMBER"
+          echo "GITHUB_REF: $GITHUB_REF"
+          echo "GITHUB_SHA: $GITHUB_SHA"
+          echo "GITHUB_WORKFLOW: $GITHUB_WORKFLOW"
+          echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY"
+          echo "GITHUB_ACTOR: $GITHUB_ACTOR"
+          echo "GITHUB_ACTIONS: $GITHUB_ACTIONS" 
 
   zig_toolchain_build:
     name: Zig Toolchain Build (Docker)
