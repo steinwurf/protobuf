@@ -17,7 +17,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
       - name: Waf Clean
-        run: python3 waf clean --no_resolve
+        run: python waf clean --no_resolve
       - name: Waf Configure
         run: python waf configure --git_protocol=git@  --cmake_verbose
       - name: Waf Build
