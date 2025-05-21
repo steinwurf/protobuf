@@ -49,11 +49,11 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v4
       - name: Waf Clean
-        run: python3 waf clean --no_resolve
+        run: python waf clean --no_resolve
       - name: Waf Configure with Zig Toolchain
-        run: python3 waf configure --git_protocol=git@ --cmake_toolchain=../cmake-toolchains/zig-toolchain-x86_64-linux-musl.cmake --cmake_verbose --with_protoc
+        run: python waf configure --git_protocol=git@ --cmake_toolchain=../cmake-toolchains/zig-toolchain-x86_64-linux-musl.cmake --cmake_verbose --with_protoc
       - name: Waf Build with Zig Toolchain
-        run: python3 waf build --run_tests
+        run: python waf build --run_tests
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
