@@ -32,8 +32,8 @@
         "name": "toolchains",
         "internal": true,
         "resolver": "git",
-        "method": "semver",
-        "major": 1,
+        "method": "checkout",
+        "checkout": "force-static-runtime-windows",
         "sources": [
             "github.com/steinwurf/cmake-toolchains.git"
         ]
