@@ -12,11 +12,12 @@ VERSION = "2.0.10"
 def options(ctx):
     ctx.load("cmake")
 
-    # Add option whether to build protoc
+    # Add option whether to build protoc - if we are in CI set to true
+
     ctx.add_option(
-        "--without_protoc",
+        "--with_protoc",
         action="store_true",
-        default=False,
+        default=os.getenv("GITHUB_ACTIONS", False),
         help="Build protoc (default: %default)",
     )
 
@@ -26,15 +27,15 @@ def configure(ctx):
     ctx.load("cmake")
 
     # Check if the user wants to build protoc
-    if ctx.options.without_protoc:
+    if ctx.options.with_protoc:
         # Add flags to build protoc
         ctx.env.CMAKE_CONFIGURE_ARGS += [
-            "-Dprotobuf_BUILD_PROTOC_BINARIES=OFF",
+            "-Dprotobuf_BUILD_PROTOC_BINARIES=ON",
         ]
     else:
         # Add flags to not build protoc
         ctx.env.CMAKE_CONFIGURE_ARGS += [
-            "-Dprotobuf_BUILD_PROTOC_BINARIES=ON",
+            "-Dprotobuf_BUILD_PROTOC_BINARIES=OFF",
         ]
 
     if ctx.is_toplevel():
