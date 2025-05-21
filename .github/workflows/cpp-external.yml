@@ -44,19 +44,9 @@ jobs:
       - name: Waf Clean
         run: python3 waf clean --no_resolve
       - name: Waf Configure
-        run: python3 waf configure --git_protocol=git@ --cmake_toolchain=${{ matrix.config.toolchain }} --cmake_verbose --with_protoc
+        run: python3 waf configure --git_protocol=git@ --cmake_toolchain=${{ matrix.config.toolchain }} --cmake_verbose
       - name: Waf Build
         run: python3 waf build --run_tests
-      - name: Echo Environment Variables
-        run: |
-          echo "GITHUB_RUN_ID: $GITHUB_RUN_ID"
-          echo "GITHUB_RUN_NUMBER: $GITHUB_RUN_NUMBER"
-          echo "GITHUB_REF: $GITHUB_REF"
-          echo "GITHUB_SHA: $GITHUB_SHA"
-          echo "GITHUB_WORKFLOW: $GITHUB_WORKFLOW"
-          echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY"
-          echo "GITHUB_ACTOR: $GITHUB_ACTOR"
-          echo "GITHUB_ACTIONS: $GITHUB_ACTIONS" 
 
   zig_toolchain_build:
     name: Zig Toolchain Build (Docker)
@@ -76,7 +66,7 @@ jobs:
       - name: Waf Clean
         run: python3 waf clean --no_resolve
       - name: Waf Configure with Zig Toolchain
-        run: python3 waf configure --git_protocol=git@ --cmake_toolchain=../resolve_symlinks/toolchains/zig-toolchain-x86_64-linux-musl.cmake --cmake_verbose --with_protoc
+        run: python3 waf configure --git_protocol=git@ --cmake_toolchain=../resolve_symlinks/toolchains/zig-toolchain-x86_64-linux-musl.cmake --cmake_verbose
       - name: Waf Build with Zig Toolchain
         run: python3 waf build --run_tests
 

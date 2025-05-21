@@ -13,7 +13,6 @@ def options(ctx):
     ctx.load("cmake")
 
     # Add option whether to build protoc - if we are in CI set to true
-
     ctx.add_option(
         "--with_protoc",
         action="store_true",
