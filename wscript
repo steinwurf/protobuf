@@ -14,6 +14,7 @@ def options(ctx):
 
     def default_with_protoc(ctx):
         if not ctx.is_toplevel():
+            # We are not the top-level build
             return False
         # Check if we are in a CI environment
         return os.getenv("GITHUB_ACTIONS", False)
