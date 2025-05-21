@@ -42,9 +42,12 @@ jobs:
 
   zig_toolchain_build:
     name: Zig Toolchain Build (Docker)
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, vm, ubuntu-current]
     container:
       image: kassany/bookworm-ziglang
+      options: --user 0:0
+      volumes:
+        - /root/.ssh:/root/.ssh   
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
