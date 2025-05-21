@@ -16,99 +16,52 @@ if (NOT DEFINED STEINWURF_RESOLVE)
         message(FATAL_ERROR "Failed: ${STATUS}")
     endif ()
     set(STEINWURF_RESOLVE "${CMAKE_CURRENT_SOURCE_DIR}/resolve_symlinks")
-    set(STEINWURF_TOP_NAME ${PROJECT_NAME})
 endif ()
 
-# Abseil
-file(GLOB_RECURSE sw_protobuf_abseil_sources ${STEINWURF_RESOLVE}/protobuf-source/third_party/abseil-cpp/absl/**/*.cc)
-list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*_benchmark.*)
-list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*benchmark.*)
-list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*test_.*)
-list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*_test.*)
-list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*mock_.*)
-list(FILTER sw_protobuf_abseil_sources EXCLUDE REGEX .*absl\/.*\/.*_mock_.*)
+# Include common CMake settings
+include("${STEINWURF_RESOLVE}/toolchains/common_settings.cmake")
 
-add_library(sw_protobuf_abseil STATIC ${sw_protobuf_abseil_sources})
-target_compile_features(sw_protobuf_abseil PUBLIC cxx_std_17)
-target_include_directories(sw_protobuf_abseil PUBLIC ${STEINWURF_RESOLVE}/protobuf-source/third_party/abseil-cpp)
-# Abseil has to be compiled with -D_LARGEFILE64_SOURCE
-target_compile_options(sw_protobuf_abseil PUBLIC -D_LARGEFILE64_SOURCE)
+# Configure Protobuf options
+set(protobuf_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(protobuf_BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(protobuf_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
-
-
-if(ANDROID)
-    target_link_libraries(sw_protobuf_abseil log)
+# Abseil dependency
+if(NOT TARGET absl::base)
+  add_subdirectory("${STEINWURF_RESOLVE}/abseil" abseil EXCLUDE_FROM_ALL)
 endif()
 
-if (APPLE)
-    target_link_libraries(sw_protobuf_abseil "-framework CoreFoundation")
-endif ()
+# Make sure we build the library
+set(protobuf_BUILD_PROTOBUF_BINARIES ON CACHE BOOL "" FORCE)
 
-# utf8_range
-file(GLOB_RECURSE sw_protobuf_utf8_range_sources
-        ${STEINWURF_RESOLVE}/protobuf-source/third_party/utf8_range/*.cc
-        ${STEINWURF_RESOLVE}/protobuf-source/third_party/utf8_range/**/*.cc)
-list(FILTER sw_protobuf_utf8_range_sources EXCLUDE REGEX .*test\.cc)
-list(FILTER sw_protobuf_utf8_range_sources EXCLUDE REGEX .*fuzz.*\.cc) # Prevents missing cstdint include
+# Use static MSVC runtime
+set(protobuf_MSVC_STATIC_RUNTIME ON CACHE BOOL "" FORCE)
 
-add_library(sw_protobuf_utf8_range STATIC ${sw_protobuf_utf8_range_sources})
-target_compile_features(sw_protobuf_utf8_range PUBLIC cxx_std_17)
-target_link_libraries(sw_protobuf_utf8_range PRIVATE sw_protobuf_abseil)
-target_include_directories(sw_protobuf_utf8_range PUBLIC ${STEINWURF_RESOLVE}/protobuf-source/third_party/utf8_range)
+# Build Protobuf
+add_subdirectory(
+    ${STEINWURF_RESOLVE}/protobuf-source
+    ${CMAKE_CURRENT_BINARY_DIR}/protobuf-source
+)
 
-if (DEFINED MSVC)
-    target_compile_options(sw_protobuf_abseil PRIVATE "/DNOMINMAX")
-endif ()
+if(${PROJECT_NAME} STREQUAL ${CMAKE_PROJECT_NAME})
 
-file(GLOB_RECURSE sw_protobuf_sources ${STEINWURF_RESOLVE}/protobuf-source/src/google/**/*.cc)
-list(FILTER sw_protobuf_sources EXCLUDE REGEX .*src/google/protobuf\/compiler\/.*)
-list(FILTER sw_protobuf_sources EXCLUDE REGEX .*src/google/protobuf\/.*test.*)
+  # Google Test dependency
+  add_subdirectory("${STEINWURF_RESOLVE}/gtest" gtest EXCLUDE_FROM_ALL)
 
-add_library(sw_protobuf STATIC ${sw_protobuf_sources})
-target_compile_features(sw_protobuf PUBLIC cxx_std_17)
-target_link_libraries(sw_protobuf PUBLIC sw_protobuf_abseil sw_protobuf_utf8_range)
-target_include_directories(sw_protobuf PUBLIC ${STEINWURF_RESOLVE}/protobuf-source/src)
+  # Build test executable
+  file(GLOB_RECURSE protobuf_test_sources ./test/*.cpp)
 
-message(STATUS "STEINWURF_PROTOC: ${STEINWURF_PROTOC}")
+  # Add .cc files to the test sources
+  file(GLOB_RECURSE protobuf_test_sources_cc ./test/*.cc)
+  list(APPEND protobuf_test_sources ${protobuf_test_sources_cc})
 
-if (STEINWURF_PROTOC)
-    file(GLOB_RECURSE sw_protobuf_protoc_sources ${STEINWURF_RESOLVE}/protobuf-source/src/google/protobuf/compiler/*.cc)
-    list(FILTER sw_protobuf_protoc_sources EXCLUDE REGEX .*src/google/protobuf\/compiler\/.*test.*)
-    list(FILTER sw_protobuf_protoc_sources EXCLUDE REGEX .*src/google/protobuf\/compiler\/.*mock.*)
-    list(FILTER sw_protobuf_protoc_sources EXCLUDE REGEX .*src/google/protobuf\/compiler\/.*fake.*)
-    list(FILTER sw_protobuf_protoc_sources EXCLUDE REGEX .*src/google/protobuf\/compiler\/allowlists\/.*_test.*)
+  add_executable(protobuf_tests ${protobuf_test_sources})
+  target_link_libraries(protobuf_tests steinwurf::gtest)
+  target_link_libraries(protobuf_tests protobuf::libprotobuf)
 
-    add_executable(protoc ${sw_protobuf_protoc_sources})
-    target_link_libraries(protoc PRIVATE sw_protobuf)
-    target_include_directories(protoc PRIVATE ${STEINWURF_RESOLVE}/protobuf-source/src)
-    target_compile_features(protoc PRIVATE cxx_std_17)
-endif ()
-# Ignore -Wattribute warnings for GCC and Clang
-if (CMAKE_C_COMPILER_ID STREQUAL "GNU" OR CMAKE_C_COMPILER_ID STREQUAL "Clang")
-    target_compile_options(sw_protobuf PRIVATE -Wno-attributes)
-endif ()
+  enable_testing()
+  add_test(protobuf_tests protobuf_tests)
 
-add_library(steinwurf::protobuf ALIAS sw_protobuf)
+endif()
 
-# Is top level project?
-if (${CMAKE_PROJECT_NAME} STREQUAL ${PROJECT_NAME})
-    enable_testing()
 
-    if (CMAKE_C_COMPILER_ID MATCHES "MSVC")
-        # For Windows: Prevent overriding the parent project's compiler/linker
-        # settings
-        set(gtest_force_shared_crt
-                ON
-                CACHE BOOL "" FORCE)
-    endif ()
-
-    # Google Test dependency
-    add_subdirectory("${STEINWURF_RESOLVE}/gtest-source")
-
-    file(GLOB_RECURSE sw_protobuf_test_sources ./test/cpp/*.cc ./test/cpp/*.cpp)
-    add_executable(sw_protobuf_test ${sw_protobuf_test_sources})
-    target_include_directories(sw_protobuf_test PRIVATE ${STEINWURF_RESOLVE}/test/cpp)
-    target_link_libraries(sw_protobuf_test PUBLIC gtest_main sw_protobuf)
-
-    add_test(sw_protobuf_test sw_protobuf_test)
-endif ()

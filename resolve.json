@@ -1,18 +1,9 @@
 [
     {
-        "name": "waf-tools",
-        "resolver": "git",
-        "method": "semver",
-        "major": 5,
-        "sources": [
-            "github.com/steinwurf/waf-tools.git"
-        ]
-    },
-    {
         "name": "protobuf-source",
         "resolver": "git",
         "method": "checkout",
-        "checkout": "v24.3",
+        "checkout": "v31.0",
         "sources": [
             "github.com/protocolbuffers/protobuf.git"
         ],
@@ -23,9 +14,28 @@
         "internal": true,
         "resolver": "git",
         "method": "semver",
-        "major": 5,
+        "major": 6,
         "sources": [
             "github.com/steinwurf/gtest.git"
+        ]
+    },
+    {
+        "name": "abseil",
+        "resolver": "git",
+        "method": "semver",
+        "major": 1,
+        "sources": [
+            "github.com/steinwurf/abseil-cpp.git"
+        ]
+    },
+    {
+        "name": "toolchains",
+        "internal": true,
+        "resolver": "git",
+        "method": "semver",
+        "major": 1,
+        "sources": [
+            "github.com/steinwurf/cmake-toolchains.git"
         ]
     }
 ]
