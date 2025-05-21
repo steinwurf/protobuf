@@ -54,7 +54,7 @@ jobs:
       - name: Install dependencies
         run: |
           apt-get update
-          apt-get install -y python3 python3-pip git cmake
+          apt-get install -y python3 python3-pip git cmake make
       - name: Waf Clean
         run: python3 waf clean --no_resolve
       - name: Waf Configure with Zig Toolchain
