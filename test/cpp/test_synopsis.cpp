@@ -40,4 +40,6 @@ TEST(test_synopsis, api)
     options.ignore_unknown_fields = false;
     status = google::protobuf::util::JsonStringToMessage(json, &m2, options);
     EXPECT_TRUE(status.ok());
+
+    google::protobuf::ShutdownProtobufLibrary();
 }
