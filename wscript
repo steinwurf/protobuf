@@ -12,11 +12,17 @@ VERSION = "2.0.10"
 def options(ctx):
     ctx.load("cmake")
 
+    def default_with_protoc(ctx):
+        if not ctx.is_toplevel():
+            return False
+        # Check if we are in a CI environment
+        return os.getenv("GITHUB_ACTIONS", False)
+
     # Add option whether to build protoc - if we are in CI set to true
     ctx.add_option(
         "--with_protoc",
         action="store_true",
-        default=os.getenv("GITHUB_ACTIONS", False),
+        default=default_with_protoc(ctx),
         help="Build protoc (default: %default)",
     )
 
